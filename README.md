@@ -1,94 +1,247 @@
-# Tic Tac Toe Game with Flask
+# 🎮 Tic Tac Toe - Professional Edition
 
-A modern, responsive Tic Tac Toe game built using Flask and Bootstrap. Created using Windsurf IDE in under 5 minutes!
+A modern, professional web-based Tic Tac Toe game built with Flask, featuring multiple difficulty levels, two-player mode, and comprehensive statistics tracking.
 
-## 🚀 Quick Overview
+## ✨ Features
 
-This project demonstrates how quickly you can create a full-stack web application using Windsurf IDE. The game features a clean UI, player vs computer gameplay, and real-time updates.
+### 🎯 Game Modes
+- **vs Computer**: Play against AI opponents with varying difficulty levels
+  - **Easy**: Perfect for beginners, makes occasional mistakes
+  - **Medium**: Balanced gameplay with strategic moves
+  - **Hard**: Unbeatable AI using minimax algorithm with alpha-beta pruning
+- **Two Player**: Local multiplayer mode for playing with friends
 
-## 🛠️ Technologies Used
+### 📊 Statistics & Tracking
+- Real-time game statistics
+- Win/loss/tie tracking
+- Total games played counter
+- Persistent session data
+- Reset statistics option
+
+### 🎨 Modern UI/UX
+- Beautiful gradient design
+- Smooth animations and transitions
+- Responsive layout for all devices
+- Visual feedback for moves
+- Winning line highlighting
+- Interactive hover effects
+
+### 🔊 Audio Feedback
+- Sound effects for moves
+- Different sounds for wins, losses, and ties
+- Optional sound toggle
+
+### 🛠️ Technical Features
+- Clean, modular code architecture
+- Configuration management system
+- Error handling and validation
+- Session-based game state
+- RESTful API design
+- Type hints and documentation
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.8 or higher
+- pip (Python package manager)
+
+### Installation & Running
+
+1. **Navigate to the project directory**
+   ```bash
+   cd TIC_TAC_TOE/tic_tac_toe
+   ```
+
+2. **Activate the virtual environment**
+   - Windows:
+     ```bash
+     .venv\Scripts\activate
+     ```
+   - macOS/Linux:
+     ```bash
+     source .venv/bin/activate
+     ```
+
+3. **Install dependencies** (if not already installed)
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run the application**
+   ```bash
+   python app.py
+   ```
+
+5. **Open your browser**
+   Navigate to `http://127.0.0.1:5000`
+
+## 💻 Technologies Used
 
 - **Backend**: Flask 3.0.0 (Python web framework)
 - **Frontend**: 
   - Bootstrap 5 (via bootstrap-flask)
-  - JavaScript (for game logic)
-  - CSS3 (for styling)
-- **Development Environment**: Windsurf IDE
+  - JavaScript ES6+ (game logic)
+  - CSS3 (modern styling with animations)
+- **AI Engine**: Minimax algorithm with alpha-beta pruning
+- **Session Management**: Flask-Session
+- **Configuration**: python-dotenv
 
 ## 📁 Project Structure
 
 ```
 tic_tac_toe/
-├── app.py              # Main Flask application
-├── requirements.txt    # Project dependencies
-├── templates/
-│   ├── base.html      # Base template with common elements
-│   └── index.html     # Game board template
-└── static/
-    ├── css/
-    │   └── style.css  # Game styling
-    └── js/
-        └── game.js    # Game logic
+├── app.py                 # Main Flask application
+├── config.py             # Configuration management
+├── game_engine.py        # Game logic and AI engine
+├── requirements.txt      # Python dependencies
+├── .env.example         # Environment variables template
+├── static/
+│   ├── css/
+│   │   └── style.css    # Modern styles and animations
+│   └── js/
+│       └── game.js      # Frontend game logic with classes
+└── templates/
+    ├── base.html        # Base template
+    └── index.html       # Main game page
 ```
 
-## 💻 How It Works
 
-### Backend (app.py)
-- Uses Flask for routing and game logic
-- Implements session management for game state
-- Provides RESTful endpoints for game moves
-- Includes computer player logic
+## 🎮 How to Play
 
-### Frontend
-- **HTML Templates**:
-  - `base.html`: Common layout and Bootstrap setup
-  - `index.html`: Game board and controls
-- **JavaScript (game.js)**:
-  - Handles player moves
-  - Makes AJAX calls to backend
-  - Updates UI in real-time
-- **CSS (style.css)**:
-  - Responsive grid layout
-  - Smooth animations
-  - Modern styling
+1. **Choose your game mode**:
+   - Select "vs Computer" to play against AI
+   - Select "Two Player" for local multiplayer
 
-## 🎮 Game Features
+2. **Set difficulty** (vs Computer mode only):
+   - Easy: Beginner-friendly AI
+   - Medium: Moderate challenge
+   - Hard: Expert-level AI
 
-1. **Player vs Computer**: Play against a computer opponent
-2. **Real-time Updates**: Instant feedback for moves
-3. **Win Detection**: Automatically detects wins and ties
-4. **Responsive Design**: Works on all screen sizes
-5. **Easy Restart**: Quick game reset option
+3. **Make your move**:
+   - Click on any empty cell to place your mark (X)
+   - In vs Computer mode, the AI will respond automatically
+   - In Two Player mode, players alternate turns
 
-## 🌟 Created with Windsurf IDE
+4. **Win the game**:
+   - Get three marks in a row (horizontal, vertical, or diagonal)
+   - Winning cells will be highlighted
+   - Statistics will update automatically
 
-This project showcases the power of Windsurf IDE:
-- **Quick Setup**: Created complete project structure in seconds
-- **Smart Suggestions**: Automated code completion and suggestions
-- **Integrated Tools**: All necessary development tools in one place
-- **Real-time Preview**: Instant feedback during development
+5. **Play again**:
+   - Click "New Game" to start fresh
+   - Click "Reset Stats" to clear all statistics
 
-## 🚀 How to Run
+## 🧠 AI Algorithm
 
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+The game uses a **Minimax algorithm with Alpha-Beta pruning** for the Hard difficulty:
 
-2. Run the application:
-   ```bash
-   python app.py
-   ```
+- **Minimax**: Explores all possible game states to find optimal moves
+- **Alpha-Beta Pruning**: Optimizes performance by eliminating unnecessary branches
+- **Depth-based Scoring**: Prefers faster wins and slower losses
+- **First Move Randomization**: Adds variety to gameplay
 
-3. Visit http://localhost:5000 in your browser
+Difficulty levels:
+- **Easy**: Random moves with 30% chance of blocking
+- **Medium**: 70% strategic play, 30% random
+- **Hard**: Perfect play using minimax algorithm
 
-## 🎯 How to Play
+## 🔧 Configuration
 
-1. Open the game in your browser
-2. Click any empty cell to place your X
-3. Computer automatically responds with O
-4. First to get three in a row wins!
-5. Click "New Game" to start over
+### Environment Variables
+
+Create a `.env` file based on `.env.example`:
+
+```env
+# Flask Configuration
+FLASK_ENV=development
+FLASK_DEBUG=true
+SECRET_KEY=your-secret-key-here
+
+# Game Settings
+ENABLE_SOUND=true
+DEFAULT_DIFFICULTY=hard
+```
+
+### Configuration Options
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `FLASK_ENV` | Environment mode | `development` |
+| `FLASK_DEBUG` | Debug mode | `true` |
+| `SECRET_KEY` | Session encryption key | Auto-generated |
+| `ENABLE_SOUND` | Enable sound effects | `true` |
+| `DEFAULT_DIFFICULTY` | Default AI difficulty | `hard` |
+
+## 🎨 Customization
+
+### Changing Colors
+
+Edit `static/css/style.css` and modify the CSS variables:
+
+```css
+:root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --success-color: #48bb78;
+    --danger-color: #f56565;
+}
+```
+
+### Adjusting AI Difficulty
+
+Edit `game_engine.py` and modify the difficulty methods to customize AI behavior.
+
+## 📱 Browser Compatibility
+
+- ✅ Chrome 90+
+- ✅ Firefox 88+
+- ✅ Safari 14+
+- ✅ Edge 90+
+- ✅ Mobile browsers
+
+## 🐛 Troubleshooting
+
+### Game not loading
+- Check that Flask server is running
+- Verify the correct port (default: 5000)
+- Check browser console for errors
+
+### Sound not working
+- Verify browser supports Web Audio API
+- Check if sounds are enabled in config
+- Try refreshing the page
+
+### Statistics not persisting
+- Ensure cookies are enabled in browser
+- Verify SECRET_KEY is set properly
+
+## 🚀 Future Enhancements
+
+- [ ] Online multiplayer support
+- [ ] User accounts and global leaderboards
+- [ ] Tournament mode
+- [ ] Custom board sizes (4x4, 5x5)
+- [ ] AI training visualization
+- [ ] Mobile app version
+- [ ] Accessibility improvements
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+## 🙏 Acknowledgments
+
+- Flask framework by Pallets Projects
+- Bootstrap for responsive design
+- Flask-Bootstrap for easy integration
+- Minimax algorithm concept
+
+---
+
+**Made with ❤️ and Python**
+
+Enjoy playing Tic Tac Toe! 🎮
+
 
 ## 💡 Code Highlights
 

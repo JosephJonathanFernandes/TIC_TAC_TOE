@@ -4,17 +4,81 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-6 text-center">
-        <h1 class="mb-4">Tic Tac Toe</h1>
-        <div class="game-status mb-3">
-            <h3 id="status">Your turn (X)</h3>
+    <div class="col-12 col-lg-10">
+        <!-- Game Header -->
+        <div class="game-header">
+            <h1>🎮 Tic Tac Toe</h1>
+            <p class="subtitle">Challenge the AI or play with a friend!</p>
         </div>
-        <div class="game-board">
-            {% for i in range(9) %}
-                <div class="cell" data-index="{{ i }}">{{ board[i] }}</div>
-            {% endfor %}
+
+        <!-- Main Game Card -->
+        <div class="game-card">
+            <!-- Game Controls -->
+            <div class="game-controls">
+                <div class="control-group">
+                    <label for="game-mode">🎯 Game Mode</label>
+                    <select id="game-mode" class="form-select" aria-label="Select game mode">
+                        <option value="vs_computer" {% if game_mode == 'vs_computer' %}selected{% endif %}>🤖 vs Computer</option>
+                        <option value="two_player" {% if game_mode == 'two_player' %}selected{% endif %}>👥 Two Player</option>
+                    </select>
+                </div>
+                <div class="control-group" id="difficulty-control">
+                    <label for="difficulty">⚡ Difficulty</label>
+                    <select id="difficulty" class="form-select" aria-label="Select difficulty level">
+                        <option value="easy" {% if difficulty == 'easy' %}selected{% endif %}>😊 Easy</option>
+                        <option value="medium" {% if difficulty == 'medium' %}selected{% endif %}>😐 Medium</option>
+                        <option value="hard" {% if difficulty == 'hard' %}selected{% endif %}>😈 Hard</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Game Status -->
+            <div class="game-status">
+                <h3 id="status" class="status-x" role="status" aria-live="polite">Your turn (X)</h3>
+            </div>
+
+            <!-- Game Board -->
+            <div class="game-board-container">
+                <div class="game-board" id="game-board" role="grid" aria-label="Tic Tac Toe game board">
+                    {% for i in range(9) %}
+                        <div class="cell" data-index="{{ i }}" aria-label="Cell {{ i + 1 }}">{{ board[i] }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Game Actions -->
+            <div class="text-center">
+                <button id="reset-game" class="btn btn-custom btn-primary-custom me-2" aria-label="Start new game">
+                    <i class="bi bi-arrow-clockwise"></i> New Game
+                </button>
+                <button id="reset-stats" class="btn btn-custom btn-secondary-custom" aria-label="Reset all statistics">
+                    <i class="bi bi-trash"></i> Reset Stats
+                </button>
+            </div>
+
+            <!-- Statistics Panel -->
+            <div class="stats-panel">
+                <h4 class="stats-title">📊 Game Statistics</h4>
+                <div class="stats-grid">
+                    <div class="stat-card stat-wins">
+                        <div class="stat-value" id="stat-wins">{{ stats.player_wins or 0 }}</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                    <div class="stat-card stat-losses">
+                        <div class="stat-value" id="stat-losses">{{ stats.computer_wins or 0 }}</div>
+                        <div class="stat-label">Losses</div>
+                    </div>
+                    <div class="stat-card stat-ties">
+                        <div class="stat-value" id="stat-ties">{{ stats.ties or 0 }}</div>
+                        <div class="stat-label">Ties</div>
+                    </div>
+                    <div class="stat-card stat-total">
+                        <div class="stat-value" id="stat-total">{{ stats.total_games or 0 }}</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button id="reset-game" class="btn btn-primary mt-4">New Game</button>
     </div>
 </div>
 {% endblock %}

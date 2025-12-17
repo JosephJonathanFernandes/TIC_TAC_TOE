@@ -1,96 +1,71 @@
+"""
+Tic Tac Toe - A professional web-based game with multiple difficulty levels.
+"""
+import os
 from flask import Flask, render_template, request, jsonify, session
 from flask_bootstrap import Bootstrap5
-import random
-import copy
+from game_engine import TicTacToeEngine
+from config import config
 
 app = Flask(__name__)
+
+# Load configuration
+env = os.environ.get('FLASK_ENV', 'development')
+app.config.from_object(config[env])
+
 bootstrap = Bootstrap5(app)
-app.secret_key = 'your-secret-key-here'
 
-def check_winner(board):
-    # Check rows, columns and diagonals
-    winning_combinations = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Rows
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Columns
-        [0, 4, 8], [2, 4, 6]  # Diagonals
-    ]
-    
-    for combo in winning_combinations:
-        if board[combo[0]] == board[combo[1]] == board[combo[2]] != "":
-            return board[combo[0]]
-    
-    if "" not in board:
-        return "tie"
-    return None
 
-def get_empty_cells(board):
-    return [i for i, cell in enumerate(board) if cell == ""]
-
-def minimax(board, depth, is_maximizing, alpha, beta):
-    result = check_winner(board)
-    
-    if result == 'O':
-        return 10 - depth
-    elif result == 'X':
-        return depth - 10
-    elif result == 'tie':
-        return 0
-        
-    if is_maximizing:
-        best_score = float('-inf')
-        for pos in get_empty_cells(board):
-            board[pos] = 'O'
-            score = minimax(board, depth + 1, False, alpha, beta)
-            board[pos] = ''
-            best_score = max(score, best_score)
-            alpha = max(alpha, best_score)
-            if beta <= alpha:
-                break
-        return best_score
-    else:
-        best_score = float('inf')
-        for pos in get_empty_cells(board):
-            board[pos] = 'X'
-            score = minimax(board, depth + 1, True, alpha, beta)
-            board[pos] = ''
-            best_score = min(score, best_score)
-            beta = min(beta, best_score)
-            if beta <= alpha:
-                break
-        return best_score
-
-def get_best_move(board):
-    best_score = float('-inf')
-    best_move = None
-    alpha = float('-inf')
-    beta = float('inf')
-    
-    # First move randomization for variety
-    empty_cells = get_empty_cells(board)
-    if len(empty_cells) >= 8:  # If it's first or second move
-        return random.choice(empty_cells)
-    
-    # Use minimax for subsequent moves
-    for pos in empty_cells:
-        board[pos] = 'O'
-        score = minimax(board, 0, False, alpha, beta)
-        board[pos] = ''
-        if score > best_score:
-            best_score = score
-            best_move = pos
-    
-    return best_move
-
-@app.route('/')
-def index():
-    # Initialize or reset the game board
+def initialize_game_session():
+    """Initialize a new game session."""
     session['board'] = [""] * 9
     session['current_player'] = 'X'
     session['game_over'] = False
-    return render_template('index.html', board=session['board'])
+    session['game_mode'] = session.get('game_mode', 'vs_computer')
+    session['difficulty'] = session.get('difficulty', app.config['DEFAULT_DIFFICULTY'])
+    session['stats'] = session.get('stats', {
+        'player_wins': 0,
+        'computer_wins': 0,
+        'ties': 0,
+        'total_games': 0
+    })
+
+@app.route('/')
+def index():
+    """Main game page."""
+    initialize_game_session()
+    return render_template('index.html', 
+                         board=session['board'],
+                         game_mode=session.get('game_mode', 'vs_computer'),
+                         difficulty=session.get('difficulty', 'hard'),
+                         stats=session.get('stats', {}))
+
+@app.route('/set_options', methods=['POST'])
+def set_options():
+    """Set game options (mode and difficulty)."""
+    data = request.json
+    game_mode = data.get('game_mode', 'vs_computer')
+    difficulty = data.get('difficulty', 'hard')
+    
+    if game_mode not in ['vs_computer', 'two_player']:
+        return jsonify({'error': 'Invalid game mode'}), 400
+    
+    if difficulty not in ['easy', 'medium', 'hard']:
+        return jsonify({'error': 'Invalid difficulty'}), 400
+    
+    session['game_mode'] = game_mode
+    session['difficulty'] = difficulty
+    initialize_game_session()
+    
+    return jsonify({
+        'success': True,
+        'game_mode': game_mode,
+        'difficulty': difficulty
+    })
 
 @app.route('/make_move', methods=['POST'])
 def make_move():
+    """Handle player move and computer response."""
     if session.get('game_over', False):
         return jsonify({'error': 'Game is over'}), 400
         
@@ -101,33 +76,110 @@ def make_move():
     board = session.get('board', [""] * 9)
     if board[position] != "":
         return jsonify({'error': 'Position already taken'}), 400
-        
-    # Player's move
-    board[position] = 'X'
-    winner = check_winner(board)
     
-    if winner is None:
-        # Computer's move using minimax
-        computer_position = get_best_move(board)
+    game_mode = session.get('game_mode', 'vs_computer')
+    current_player = session.get('current_player', 'X')
+    
+    # Initialize game engine
+    engine = TicTacToeEngine(session.get('difficulty', 'hard'))
+    
+    # Player's move
+    try:
+        board, winner = engine.make_move(board, position, current_player)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    
+    winning_line = None
+    computer_position = None
+    
+    # Check for winner after player's move
+    if winner is None and game_mode == 'vs_computer' and current_player == 'X':
+        # Computer's move
+        computer_position = engine.get_computer_move(board)
         if computer_position is not None:
-            board[computer_position] = 'O'
-            winner = check_winner(board)
+            board, winner = engine.make_move(board, computer_position, 'O')
+    elif game_mode == 'two_player':
+        # Switch player in two-player mode
+        current_player = 'O' if current_player == 'X' else 'X'
+        session['current_player'] = current_player
     
     session['board'] = board
     
     if winner:
         session['game_over'] = True
+        winning_line = engine.get_winning_line(board)
+        
+        # Update statistics
+        stats = session.get('stats', {
+            'player_wins': 0,
+            'computer_wins': 0,
+            'ties': 0,
+            'total_games': 0
+        })
+        
+        stats['total_games'] += 1
+        if winner == 'X':
+            stats['player_wins'] += 1
+        elif winner == 'O':
+            stats['computer_wins'] += 1
+        elif winner == 'tie':
+            stats['ties'] += 1
+        
+        session['stats'] = stats
+        
         return jsonify({
             'board': board,
             'winner': winner,
-            'game_over': True
+            'game_over': True,
+            'winning_line': winning_line,
+            'computer_position': computer_position,
+            'stats': stats
         })
     
     return jsonify({
         'board': board,
         'winner': None,
-        'game_over': False
+        'game_over': False,
+        'winning_line': None,
+        'computer_position': computer_position,
+        'current_player': current_player
     })
+
+@app.route('/reset_game', methods=['POST'])
+def reset_game():
+    """Reset the current game."""
+    initialize_game_session()
+    return jsonify({
+        'success': True,
+        'board': session['board']
+    })
+
+@app.route('/reset_stats', methods=['POST'])
+def reset_stats():
+    """Reset game statistics."""
+    session['stats'] = {
+        'player_wins': 0,
+        'computer_wins': 0,
+        'ties': 0,
+        'total_games': 0
+    }
+    return jsonify({
+        'success': True,
+        'stats': session['stats']
+    })
+
+@app.route('/get_stats', methods=['GET'])
+def get_stats():
+    """Get current game statistics."""
+    return jsonify({
+        'stats': session.get('stats', {
+            'player_wins': 0,
+            'computer_wins': 0,
+            'ties': 0,
+            'total_games': 0
+        })
+    })
+
 
 if __name__ == '__main__':
     app.run(debug=True)

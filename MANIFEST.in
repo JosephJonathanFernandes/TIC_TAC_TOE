@@ -1,0 +1,8 @@
+include README.md
+include LICENSE
+include CHANGELOG.md
+include CONTRIBUTING.md
+include ENHANCEMENTS.md
+recursive-include tic_tac_toe/templates *
+recursive-include tic_tac_toe/static *
+include tic_tac_toe/requirements.txt
